@@ -1,0 +1,642 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', sans-serif; }
+
+  #kahoot-root {
+    min-height: 500px;
+    background: #1a0533;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  /* ── SABES colors: deep purple + orange accent ── */
+  .sabes-header {
+    background: linear-gradient(135deg, #5c1f8a 0%, #7c2fa3 60%, #9b3cc2 100%);
+    padding: 18px 24px 14px;
+    text-align: center;
+    border-bottom: 4px solid #f7941d;
+    position: relative;
+  }
+  .sabes-logo-bar {
+    display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 6px;
+  }
+  .sabes-badge {
+    background: #f7941d; color: #fff; font-size: 11px; font-weight: 900;
+    padding: 3px 10px; border-radius: 20px; letter-spacing: 1px; text-transform: uppercase;
+  }
+  .sabes-title { color: #fff; font-size: 22px; font-weight: 900; letter-spacing: -0.5px; }
+  .sabes-subtitle { color: #e0bbff; font-size: 13px; font-weight: 700; margin-top: 2px; }
+
+  /* Progress */
+  .progress-bar-wrap {
+    background: rgba(255,255,255,0.15);
+    height: 6px; margin: 0; border-radius: 0;
+  }
+  .progress-bar-fill {
+    background: #f7941d;
+    height: 6px; border-radius: 0 3px 3px 0;
+    transition: width 0.5s ease;
+  }
+
+  /* Main area */
+  .main-area { padding: 20px 24px 24px; }
+
+  /* Phase badge */
+  .phase-pill {
+    display: inline-block; font-size: 11px; font-weight: 900; letter-spacing: 1px;
+    padding: 3px 12px; border-radius: 20px; text-transform: uppercase; margin-bottom: 10px;
+  }
+  .phase-i { background: #f7941d; color: #1a0533; }
+  .phase-ii { background: #9b3cc2; color: #fff; border: 2px solid #f7941d; }
+
+  /* Assertion card */
+  .assertion-card {
+    background: linear-gradient(135deg, #7c2fa3, #5c1f8a);
+    border: 2px solid #f7941d;
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    text-align: center;
+    position: relative;
+    min-height: 90px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .assertion-icon {
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: #f7941d; color: #1a0533; font-size: 18px;
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .assertion-text {
+    color: #fff; font-size: 15px; font-weight: 700; line-height: 1.5; font-style: italic;
+  }
+
+  /* Question */
+  .question-box {
+    background: rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 18px;
+    text-align: center;
+  }
+  .question-number { color: #f7941d; font-size: 12px; font-weight: 900; margin-bottom: 6px; letter-spacing: 1px; text-transform: uppercase; }
+  .question-text { color: #fff; font-size: 17px; font-weight: 800; line-height: 1.45; }
+
+  /* Answer grid */
+  .answers-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .ans-btn {
+    border: none; cursor: pointer; border-radius: 10px;
+    padding: 14px 10px; font-family: 'Nunito', sans-serif;
+    font-size: 14px; font-weight: 800; line-height: 1.3;
+    display: flex; align-items: center; gap: 8px;
+    transition: transform 0.12s, filter 0.12s;
+    text-align: left;
+  }
+  .ans-btn:hover:not(:disabled) { transform: scale(1.04); filter: brightness(1.1); }
+  .ans-btn:active:not(:disabled) { transform: scale(0.97); }
+  .ans-btn:disabled { cursor: default; }
+  .ans-icon {
+    width: 28px; height: 28px; border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 900; flex-shrink: 0;
+    background: rgba(0,0,0,0.25); color: #fff;
+  }
+  .ans-label { color: #fff; flex: 1; }
+
+  .ans-a { background: #e84040; }
+  .ans-b { background: #1a8fd1; }
+  .ans-c { background: #f7941d; }
+  .ans-d { background: #2dbe6c; }
+
+  /* Feedback */
+  .feedback-box {
+    border-radius: 12px; padding: 14px 18px; text-align: center;
+    margin-bottom: 14px; display: none;
+  }
+  .feedback-correct { background: #2dbe6c; }
+  .feedback-wrong { background: #e84040; }
+  .feedback-icon { font-size: 28px; margin-bottom: 4px; }
+  .feedback-title { color: #fff; font-size: 18px; font-weight: 900; }
+  .feedback-msg { color: rgba(255,255,255,0.9); font-size: 13px; font-weight: 700; margin-top: 4px; }
+
+  /* Timer */
+  .timer-ring-wrap {
+    display: flex; justify-content: center; margin-bottom: 14px;
+  }
+  .timer-svg { transform: rotate(-90deg); }
+  .timer-text {
+    font-size: 20px; font-weight: 900; fill: #fff;
+    transform: rotate(90deg) translateY(-4px);
+    transform-origin: 30px 30px;
+    dominant-baseline: middle;
+    text-anchor: middle;
+  }
+
+  /* Buttons */
+  .btn-next {
+    width: 100%; padding: 14px; border-radius: 12px; border: none;
+    background: #f7941d; color: #1a0533; font-family: 'Nunito', sans-serif;
+    font-size: 16px; font-weight: 900; cursor: pointer;
+    transition: transform 0.1s, filter 0.1s;
+    display: none;
+  }
+  .btn-next:hover { filter: brightness(1.1); transform: scale(1.02); }
+
+  /* Score bar */
+  .score-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    background: rgba(255,255,255,0.08); border-radius: 10px;
+    padding: 8px 14px; margin-bottom: 16px;
+  }
+  .score-item { text-align: center; }
+  .score-label { color: #e0bbff; font-size: 11px; font-weight: 700; }
+  .score-value { color: #f7941d; font-size: 20px; font-weight: 900; }
+  .score-divider { width: 1px; height: 30px; background: rgba(255,255,255,0.2); }
+
+  /* Transition screen */
+  .transition-screen {
+    text-align: center; padding: 30px 20px;
+  }
+  .trans-emoji { font-size: 52px; margin-bottom: 10px; }
+  .trans-title { color: #f7941d; font-size: 22px; font-weight: 900; margin-bottom: 8px; }
+  .trans-msg { color: #e0bbff; font-size: 15px; font-weight: 700; margin-bottom: 24px; }
+
+  /* Final screen */
+  .final-screen { text-align: center; padding: 20px; }
+  .final-trophy { font-size: 60px; margin-bottom: 10px; }
+  .final-title { color: #f7941d; font-size: 26px; font-weight: 900; margin-bottom: 4px; }
+  .final-score { color: #fff; font-size: 42px; font-weight: 900; margin: 12px 0; }
+  .final-sub { color: #e0bbff; font-size: 14px; font-weight: 700; margin-bottom: 18px; }
+  .rank-bar {
+    background: rgba(255,255,255,0.08); border-radius: 12px; padding: 14px;
+    margin-bottom: 14px; text-align: left;
+  }
+  .rank-title { color: #f7941d; font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+  .rank-item { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
+  .rank-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .rank-text { color: #e0bbff; font-size: 13px; font-weight: 700; }
+  .btn-restart {
+    width: 100%; padding: 14px; border-radius: 12px; border: 2px solid #f7941d;
+    background: transparent; color: #f7941d; font-family: 'Nunito', sans-serif;
+    font-size: 16px; font-weight: 900; cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .btn-restart:hover { background: #f7941d; color: #1a0533; }
+
+  /* Start screen */
+  .start-screen { text-align: center; padding: 24px 20px; }
+  .start-emoji { font-size: 56px; margin-bottom: 10px; }
+  .start-title { color: #fff; font-size: 24px; font-weight: 900; margin-bottom: 8px; }
+  .start-info { background: rgba(255,255,255,0.08); border-radius: 12px; padding: 14px; margin-bottom: 20px; text-align: left; }
+  .start-row { display: flex; align-items: center; gap: 8px; margin: 6px 0; color: #e0bbff; font-size: 13px; font-weight: 700; }
+  .start-row span:first-child { font-size: 16px; }
+  .btn-start {
+    width: 100%; padding: 16px; border-radius: 12px; border: none;
+    background: linear-gradient(135deg, #f7941d, #e07010);
+    color: #fff; font-family: 'Nunito', sans-serif;
+    font-size: 18px; font-weight: 900; cursor: pointer;
+    transition: transform 0.1s, filter 0.1s;
+    letter-spacing: 0.5px;
+  }
+  .btn-start:hover { filter: brightness(1.1); transform: scale(1.02); }
+</style>
+
+<div id="kahoot-root">
+  <div class="sabes-header">
+    <div class="sabes-logo-bar">
+      <div class="sabes-badge">SABES</div>
+      <div class="sabes-badge" style="background:#9b3cc2;">Estadística</div>
+    </div>
+    <div class="sabes-title">Quiz Kahoot 📊</div>
+    <div class="sabes-subtitle">Estadística Inferencial · Mayo–Agosto 2026</div>
+  </div>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress" style="width:0%"></div></div>
+  <div class="main-area" id="main-area"></div>
+</div>
+
+<script>
+const questions = [
+  {fase:"I",no:1,tema:"Media y desviación estándar",
+   assertion:"La media resume el centro de los datos, pero no explica por sí sola la dispersión.",
+   question:"¿Qué medida indica qué tan separados están los datos respecto a la media?",
+   opts:["Mediana","Muestra","Desviación estándar","Tamaño de muestra"],
+   correct:2, time:45,
+   feedback:"La desviación estándar mide la variabilidad alrededor de la media."},
+  {fase:"I",no:2,tema:"Población y muestra",
+   assertion:"En estadística, casi nunca se estudia toda la población; se trabaja con una parte representativa.",
+   question:"¿Cómo se llama el subconjunto de elementos tomado de una población para analizarla?",
+   opts:["Parámetro","Muestra","Variable","Intervalo"],
+   correct:1, time:45,
+   feedback:"La muestra es una parte de la población usada para inferir sobre ella."},
+  {fase:"I",no:3,tema:"Tipos de variables",
+   assertion:"Algunas variables representan categorías y otras cantidades medibles.",
+   question:"¿Cuál de las siguientes variables es cuantitativa?",
+   opts:["Color favorito","Tipo de producto","Tiempo de espera","Estado civil"],
+   correct:2, time:45,
+   feedback:"El tiempo de espera se expresa numéricamente y permite operaciones aritméticas."},
+  {fase:"I",no:4,tema:"Probabilidad",
+   assertion:"La inferencia estadística se apoya en la probabilidad para tomar decisiones bajo incertidumbre.",
+   question:"Si un evento es imposible, ¿cuál es su probabilidad?",
+   opts:["0","0.5","1","100"],
+   correct:0, time:45,
+   feedback:"Una probabilidad igual a 0 representa un evento imposible."},
+  {fase:"I",no:5,tema:"Distribución normal",
+   assertion:"Muchos métodos inferenciales se basan en distribuciones con forma de campana.",
+   question:"¿Qué distribución se representa con una curva simétrica en forma de campana?",
+   opts:["Binomial","Normal","Uniforme","Poisson"],
+   correct:1, time:45,
+   feedback:"La distribución normal es simétrica y concentra más datos cerca de la media."},
+  {fase:"I",no:6,tema:"Regla de decisión",
+   assertion:"En estadística no basta calcular: se debe interpretar el resultado para decidir.",
+   question:"¿Qué debe hacerse después de obtener un resultado estadístico?",
+   opts:["Copiarlo sin analizar","Interpretarlo en el contexto","Eliminar datos atípicos siempre","Cambiar la hipótesis"],
+   correct:1, time:45,
+   feedback:"El resultado debe relacionarse con el problema real para tomar una decisión."},
+  {fase:"I",no:7,tema:"Gráficas",
+   assertion:"Una gráfica adecuada permite detectar tendencias, dispersión y posibles datos atípicos.",
+   question:"¿Qué gráfico es más útil para observar la relación entre dos variables cuantitativas?",
+   opts:["Diagrama de dispersión","Gráfico de pastel","Organigrama","Mapa mental"],
+   correct:0, time:45,
+   feedback:"El diagrama de dispersión permite visualizar asociación entre dos variables numéricas."},
+  {fase:"I",no:8,tema:"Parámetro y estadístico",
+   assertion:"Un parámetro describe a la población; un estadístico describe a la muestra.",
+   question:"¿Cuál de los siguientes valores representa un estadístico?",
+   opts:["Media de toda la población","Proporción real de todos los clientes","Media calculada con una muestra","Tamaño total de la población"],
+   correct:2, time:45,
+   feedback:"Un estadístico se calcula a partir de los datos de la muestra."},
+  {fase:"II",no:9,tema:"Inferencia estadística",
+   assertion:"La inferencia permite sacar conclusiones sobre una población usando información muestral.",
+   question:"¿Cuál es el propósito central de la inferencia estadística?",
+   opts:["Describir solo los datos observados","Inferir características de una población desde una muestra","Eliminar la incertidumbre por completo","Sustituir la recolección de datos"],
+   correct:1, time:60,
+   feedback:"La inferencia usa muestras para estimar, probar o tomar decisiones sobre poblaciones."},
+  {fase:"II",no:10,tema:"Muestreo",
+   assertion:"Un buen muestreo reduce sesgos y mejora la confianza en los resultados.",
+   question:"¿Qué riesgo aparece cuando la muestra no representa adecuadamente a la población?",
+   opts:["Mayor precisión automática","Sesgo en las conclusiones","Eliminación del error","Aumento del tamaño poblacional"],
+   correct:1, time:60,
+   feedback:"Una muestra no representativa puede generar conclusiones sesgadas."},
+  {fase:"II",no:11,tema:"Estimación puntual",
+   assertion:"La estimación puntual ofrece un solo valor aproximado para un parámetro poblacional.",
+   question:"¿Cuál es un ejemplo de estimación puntual?",
+   opts:["La media muestral usada para estimar la media poblacional","Un rango con límite inferior y superior","Una hipótesis nula","Una tabla de frecuencias"],
+   correct:0, time:60,
+   feedback:"La media muestral puede funcionar como estimador puntual de la media poblacional."},
+  {fase:"II",no:12,tema:"Intervalo de confianza",
+   assertion:"Un intervalo de confianza expresa un rango probable para un parámetro, no una garantía absoluta.",
+   question:"¿Qué representa un intervalo de confianza?",
+   opts:["Un rango de valores plausibles para un parámetro poblacional","El valor exacto de cada dato","La eliminación total del error","Una calificación final"],
+   correct:0, time:60,
+   feedback:"El intervalo de confianza comunica estimación e incertidumbre."},
+  {fase:"II",no:13,tema:"Tamaño de muestra",
+   assertion:"A mayor precisión deseada, normalmente se requiere una muestra más grande.",
+   question:"¿Qué ocurre con el tamaño de muestra cuando se desea reducir el margen de error?",
+   opts:["Disminuye siempre","Aumenta generalmente","No cambia nunca","Se vuelve igual a cero"],
+   correct:1, time:60,
+   feedback:"Reducir el margen de error exige más información, por eso suele aumentar n."},
+  {fase:"II",no:14,tema:"Hipótesis estadística",
+   assertion:"Una prueba de hipótesis inicia planteando una hipótesis nula y una alternativa.",
+   question:"¿Qué representa la hipótesis nula H₀?",
+   opts:["La afirmación inicial que se contrasta con evidencia muestral","La conclusión obligatoria","El error de medición","El tamaño de muestra"],
+   correct:0, time:60,
+   feedback:"H₀ es la afirmación base que se evalúa mediante la evidencia estadística."},
+  {fase:"II",no:15,tema:"Errores tipo I y II",
+   assertion:"En pruebas de hipótesis se puede cometer error al rechazar o no rechazar H₀.",
+   question:"¿Qué es un error tipo I?",
+   opts:["No rechazar H₀ cuando es falsa","Rechazar H₀ cuando es verdadera","Calcular mal la media","Usar una muestra grande"],
+   correct:1, time:60,
+   feedback:"El error tipo I ocurre cuando se rechaza una hipótesis nula que en realidad es verdadera."},
+  {fase:"II",no:16,tema:"Valor p",
+   assertion:"El valor p ayuda a decidir si la evidencia contra H₀ es suficientemente fuerte.",
+   question:"Si el valor p < α (nivel de significancia), ¿qué decisión se toma comúnmente?",
+   opts:["No rechazar H₀","Rechazar H₀","Aumentar la muestra sin decidir","Ignorar el resultado"],
+   correct:1, time:60,
+   feedback:"Cuando p < α, se considera que hay evidencia suficiente para rechazar H₀."},
+  {fase:"II",no:17,tema:"Pruebas no paramétricas",
+   assertion:"Las pruebas no paramétricas son útiles cuando no se cumplen supuestos fuertes de normalidad.",
+   question:"¿Cuándo puede ser conveniente usar una prueba no paramétrica?",
+   opts:["Cuando los datos no cumplen supuestos paramétricos","Solo cuando hay millones de datos","Siempre que la media sea cero","Cuando no existen variables"],
+   correct:0, time:60,
+   feedback:"Las pruebas no paramétricas ayudan cuando los supuestos paramétricos no son adecuados."},
+  {fase:"II",no:18,tema:"Bondad de ajuste",
+   assertion:"La bondad de ajuste compara frecuencias observadas contra frecuencias esperadas.",
+   question:"¿Qué evalúa una prueba de bondad de ajuste?",
+   opts:["Si una distribución observada se ajusta a una esperada","La relación lineal entre dos variables","El promedio exacto de una población","La pendiente de una recta"],
+   correct:0, time:60,
+   feedback:"Compara lo observado con lo esperado bajo un modelo o distribución."},
+  {fase:"II",no:19,tema:"Correlación",
+   assertion:"La correlación mide asociación entre variables, pero no demuestra causalidad.",
+   question:"¿Qué afirmación es correcta sobre la correlación?",
+   opts:["Siempre prueba causa y efecto","Mide asociación entre dos variables","Solo aplica a variables cualitativas","Elimina la variabilidad"],
+   correct:1, time:60,
+   feedback:"La correlación indica fuerza y dirección de asociación, no causalidad por sí sola."},
+  {fase:"II",no:20,tema:"Regresión y ANOVA",
+   assertion:"La regresión permite modelar relaciones; ANOVA compara medias entre grupos.",
+   question:"¿Cuál es el propósito general del ANOVA?",
+   opts:["Comparar medias entre grupos","Ordenar datos alfabéticamente","Calcular únicamente porcentajes","Diseñar cuestionarios"],
+   correct:0, time:60,
+   feedback:"ANOVA se usa para analizar diferencias entre medias de varios grupos."}
+];
+
+const optColors = ['#e84040','#1a8fd1','#f7941d','#2dbe6c'];
+const optLabels = ['A','B','C','D'];
+const optIcons = ['▲','◆','●','✚'];
+const emojis = ['🎯','🚀','⚡','🧠','🔥','💥','🌟','🎲','🏆','💡'];
+
+let state = {
+  screen: 'start',
+  q: 0,
+  score: 0,
+  correct: 0,
+  wrong: 0,
+  streak: 0,
+  phase: 'assertion',
+  timer: null,
+  timeLeft: 0,
+  answered: false,
+  wrongAnswers: []
+};
+
+function renderProgress() {
+  const pct = state.screen === 'quiz' ? ((state.q) / questions.length * 100) : 0;
+  document.getElementById('progress').style.width = pct + '%';
+}
+
+function render() {
+  renderProgress();
+  const area = document.getElementById('main-area');
+  if (state.screen === 'start') { area.innerHTML = renderStart(); return; }
+  if (state.screen === 'transition') { area.innerHTML = renderTransition(); return; }
+  if (state.screen === 'final') { area.innerHTML = renderFinal(); return; }
+  if (state.screen === 'quiz') {
+    area.innerHTML = renderQuiz();
+    if (state.phase === 'assertion') startAssertionTimer();
+    else if (state.phase === 'question' && !state.answered) startQuestionTimer();
+  }
+}
+
+function renderStart() {
+  return `<div class="start-screen">
+    <div class="start-emoji">📊</div>
+    <div class="start-title">¡Bienvenido al Quiz!</div>
+    <div class="start-info">
+      <div class="start-row"><span>📋</span><span>20 preguntas en 2 fases</span></div>
+      <div class="start-row"><span>⏱️</span><span>Fase I: 45 s por pregunta</span></div>
+      <div class="start-row"><span>⏱️</span><span>Fase II: 60 s por pregunta</span></div>
+      <div class="start-row"><span>💡</span><span>Primero verás una afirmación, luego la pregunta</span></div>
+      <div class="start-row"><span>🎯</span><span>Fase I es diagnóstica — ¡sin penalización!</span></div>
+      <div class="start-row"><span>⭐</span><span>Racha de respuestas correctas = bonus</span></div>
+    </div>
+    <button class="btn-start" onclick="startQuiz()">¡JUGAR AHORA! 🚀</button>
+  </div>`;
+}
+
+function renderTransition() {
+  return `<div class="transition-screen">
+    <div class="trans-emoji">🚀</div>
+    <div class="trans-title">¡Fase I completada!</div>
+    <div class="trans-msg">Ahora comienza la <strong style="color:#f7941d">Fase II</strong>:<br>contenidos formales del curso.<br>¡60 segundos por pregunta!</div>
+    <div class="score-bar">
+      <div class="score-item"><div class="score-label">PUNTOS</div><div class="score-value">${state.score}</div></div>
+      <div class="score-divider"></div>
+      <div class="score-item"><div class="score-label">CORRECTAS</div><div class="score-value" style="color:#2dbe6c">${state.correct}</div></div>
+      <div class="score-divider"></div>
+      <div class="score-item"><div class="score-label">RACHA</div><div class="score-value" style="color:#f7941d">${state.streak}🔥</div></div>
+    </div>
+    <button class="btn-start" onclick="continueToFaseII()">Continuar a Fase II →</button>
+  </div>`;
+}
+
+function renderQuiz() {
+  const q = questions[state.q];
+  const phasePill = q.fase === 'I'
+    ? `<span class="phase-pill phase-i">FASE I · Conocimientos previos</span>`
+    : `<span class="phase-pill phase-ii">FASE II · Módulo ${['','I','I','II','II','II','III','III','III','IV','IV','V','V'][q.no - 8] || 'V'}</span>`;
+
+  if (state.phase === 'assertion') {
+    return `<div>
+      ${phasePill}
+      <div class="score-bar">
+        <div class="score-item"><div class="score-label">PUNTOS</div><div class="score-value">${state.score}</div></div>
+        <div class="score-divider"></div>
+        <div class="score-item"><div class="score-label">PREGUNTA</div><div class="score-value">${state.q+1}/20</div></div>
+        <div class="score-divider"></div>
+        <div class="score-item"><div class="score-label">RACHA</div><div class="score-value" style="color:#f7941d">${state.streak}🔥</div></div>
+      </div>
+      <div style="text-align:center;margin-bottom:10px">
+        ${renderTimerSVG(state.timeLeft, 10)}
+      </div>
+      <div class="assertion-card">
+        <div class="assertion-icon">💬</div>
+        <div class="assertion-text">"${q.assertion}"</div>
+      </div>
+      <div style="text-align:center;color:#e0bbff;font-size:13px;font-weight:700;margin-top:4px">
+        ✨ Lee esta afirmación antes de responder...
+      </div>
+    </div>`;
+  }
+
+  const opts = q.opts.map((o, i) => {
+    let style = '';
+    if (state.answered) {
+      if (i === q.correct) style = `filter:brightness(1.2);box-shadow:0 0 0 3px #fff inset;`;
+      else style = `opacity:0.4;`;
+    }
+    return `<button class="ans-btn" style="background:${optColors[i]};${style}" 
+      onclick="answer(${i})" ${state.answered ? 'disabled' : ''}>
+      <div class="ans-icon">${optIcons[i]}</div>
+      <div class="ans-label">${o}</div>
+    </button>`;
+  }).join('');
+
+  return `<div>
+    ${phasePill}
+    <div class="score-bar">
+      <div class="score-item"><div class="score-label">PUNTOS</div><div class="score-value">${state.score}</div></div>
+      <div class="score-divider"></div>
+      <div class="score-item"><div class="score-label">PREGUNTA</div><div class="score-value">${state.q+1}/20</div></div>
+      <div class="score-divider"></div>
+      <div class="score-item"><div class="score-label">RACHA</div><div class="score-value" style="color:#f7941d">${state.streak}🔥</div></div>
+    </div>
+    <div class="question-box">
+      <div class="question-number">TEMA: ${q.tema}</div>
+      <div class="question-text">${q.question}</div>
+    </div>
+    <div style="text-align:center;margin-bottom:10px">
+      ${renderTimerSVG(state.timeLeft, q.time)}
+    </div>
+    <div class="answers-grid">${opts}</div>
+    <div class="feedback-box ${state.answered ? (state.lastCorrect ? 'feedback-correct' : 'feedback-wrong') : ''}" 
+         id="feedback" style="display:${state.answered ? 'block' : 'none'}">
+      <div class="feedback-icon">${state.answered ? (state.lastCorrect ? '✅' : '❌') : ''}</div>
+      <div class="feedback-title">${state.answered ? (state.lastCorrect ? '¡Correcto! +' + getPoints(q) + ' pts' : '¡Incorrecto!') : ''}</div>
+      <div class="feedback-msg">${state.answered ? q.feedback : ''}</div>
+    </div>
+    <button class="btn-next" id="btn-next" style="display:${state.answered ? 'block' : 'none'}" onclick="nextQuestion()">
+      ${state.q < questions.length - 1 ? 'Siguiente pregunta →' : '¡Ver resultados! 🏆'}
+    </button>
+  </div>`;
+}
+
+function renderTimerSVG(timeLeft, total) {
+  const r = 28, cx = 32, cy = 32;
+  const circ = 2 * Math.PI * r;
+  const pct = total > 0 ? timeLeft / total : 0;
+  const dash = circ * pct;
+  const color = pct > 0.5 ? '#2dbe6c' : pct > 0.25 ? '#f7941d' : '#e84040';
+  return `<svg width="64" height="64" class="timer-svg" style="transform:rotate(-90deg)">
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="4"/>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${color}" stroke-width="4"
+      stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}" stroke-linecap="round"/>
+    <text x="${cx}" y="${cy+1}" class="timer-text" fill="#fff" font-size="14" font-weight="900"
+      text-anchor="middle" dominant-baseline="middle"
+      style="transform:rotate(90deg);transform-origin:${cx}px ${cy}px">${timeLeft}</text>
+  </svg>`;
+}
+
+function getPoints(q) {
+  if (q.fase === 'I') return 0;
+  const base = 100;
+  const streak_bonus = Math.min(state.streak, 5) * 20;
+  return base + streak_bonus;
+}
+
+function startQuiz() {
+  state.q = 0; state.score = 0; state.correct = 0; state.wrong = 0;
+  state.streak = 0; state.screen = 'quiz'; state.wrongAnswers = [];
+  state.phase = 'assertion'; state.answered = false;
+  state.timeLeft = 10;
+  render();
+}
+
+function startAssertionTimer() {
+  clearInterval(state.timer);
+  state.timeLeft = 10;
+  state.timer = setInterval(() => {
+    state.timeLeft--;
+    const svg = document.querySelector('.timer-svg');
+    if (svg) svg.parentElement.innerHTML = renderTimerSVG(state.timeLeft, 10);
+    if (state.timeLeft <= 0) {
+      clearInterval(state.timer);
+      state.phase = 'question';
+      state.answered = false;
+      state.timeLeft = questions[state.q].time;
+      render();
+    }
+  }, 1000);
+}
+
+function startQuestionTimer() {
+  clearInterval(state.timer);
+  const q = questions[state.q];
+  state.timer = setInterval(() => {
+    state.timeLeft--;
+    const svg = document.querySelector('.timer-svg');
+    if (svg) svg.parentElement.innerHTML = renderTimerSVG(state.timeLeft, q.time);
+    if (state.timeLeft <= 0) {
+      clearInterval(state.timer);
+      if (!state.answered) {
+        state.answered = true;
+        state.lastCorrect = false;
+        state.streak = 0;
+        state.wrong++;
+        state.wrongAnswers.push(q.tema);
+        render();
+      }
+    }
+  }, 1000);
+}
+
+function answer(idx) {
+  if (state.answered) return;
+  clearInterval(state.timer);
+  state.answered = true;
+  const q = questions[state.q];
+  state.lastCorrect = (idx === q.correct);
+  if (state.lastCorrect) {
+    state.streak++;
+    state.correct++;
+    if (q.fase === 'II') state.score += getPoints(q);
+  } else {
+    state.streak = 0;
+    state.wrong++;
+    state.wrongAnswers.push(q.tema);
+  }
+  render();
+}
+
+function nextQuestion() {
+  clearInterval(state.timer);
+  state.q++;
+  state.answered = false;
+  state.phase = 'assertion';
+
+  if (state.q === 8) {
+    state.screen = 'transition';
+    render();
+    return;
+  }
+  if (state.q >= questions.length) {
+    state.screen = 'final';
+    render();
+    return;
+  }
+  state.timeLeft = 10;
+  render();
+}
+
+function continueToFaseII() {
+  state.screen = 'quiz';
+  state.phase = 'assertion';
+  state.answered = false;
+  state.timeLeft = 10;
+  render();
+}
+
+function renderFinal() {
+  const total = questions.filter(q => q.fase === 'II').length;
+  const pct = Math.round((state.correct / 20) * 100);
+  let medal = '🥉'; let msg = 'Sigue practicando';
+  if (pct >= 90) { medal = '🥇'; msg = '¡Experto en estadística!'; }
+  else if (pct >= 70) { medal = '🥈'; msg = '¡Muy buen dominio!'; }
+  else if (pct >= 50) { medal = '🥉'; msg = '¡Vas por buen camino!'; }
+
+  const worngHTML = state.wrongAnswers.length
+    ? state.wrongAnswers.slice(0,5).map(t =>
+        `<div class="rank-item"><div class="rank-dot" style="background:#e84040"></div><div class="rank-text">Repasar: <strong>${t}</strong></div></div>`
+      ).join('')
+    : `<div class="rank-item"><div class="rank-dot" style="background:#2dbe6c"></div><div class="rank-text">¡Sin errores en los temas revisados!</div></div>`;
+
+  document.getElementById('progress').style.width = '100%';
+
+  return `<div class="final-screen">
+    <div class="final-trophy">${medal}</div>
+    <div class="final-title">${msg}</div>
+    <div class="final-score">${state.score} pts</div>
+    <div class="final-sub">${state.correct}/20 correctas · ${pct}% de acierto</div>
+    <div class="score-bar" style="margin-bottom:16px">
+      <div class="score-item"><div class="score-label">FASE I (diagnóstico)</div><div class="score-value" style="color:#9b3cc2">${questions.slice(0,8).filter((_,i)=>!state.wrongAnswers.includes(questions[i].tema)).length > 0 ? '✓' : '—'}</div></div>
+      <div class="score-divider"></div>
+      <div class="score-item"><div class="score-label">CORRECTAS</div><div class="score-value" style="color:#2dbe6c">${state.correct}</div></div>
+      <div class="score-divider"></div>
+      <div class="score-item"><div class="score-label">RACHA MÁX</div><div class="score-value" style="color:#f7941d">${state.streak}🔥</div></div>
+    </div>
+    <div class="rank-bar">
+      <div class="rank-title">💡 Temas a repasar</div>
+      ${worngHTML}
+    </div>
+    <button class="btn-restart" onclick="startQuiz()">🔄 Jugar de nuevo</button>
+  </div>`;
+}
+
+render();
+</script>
